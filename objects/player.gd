@@ -52,26 +52,18 @@ signal health_updated
 
 @export var crosshair:TextureRect
 
-# Functions
-
 func _ready():
-	
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	weapon = weapons[weapon_index] # Weapon must never be nil
 	initiate_change_weapon(weapon_index)
 
 func _physics_process(delta):
-	
-	# Handle functions
-	
 	handle_controls(delta)
 	
 	if is_on_floor():
 		jump_single = true
 		movement_velocity.y = max(movement_velocity.y, 0.0)
-	
-	#movement_velocity.y = lerp(movement_velocity.y, -terminal_velocity, delta * gravity_acceleration/terminal_velocity)
 	
 	movement_velocity.y = clamp( movement_velocity.y - gravity_acceleration * delta, -terminal_velocity, terminal_velocity)
 	
@@ -93,7 +85,6 @@ func _physics_process(delta):
 	container.position = lerp(container.position, container_offset - (applied_velocity / 30), delta * 10)
 	
 	# Movement sound
-	
 	sound_footsteps.stream_paused = true
 	
 	if is_on_floor():
@@ -101,7 +92,6 @@ func _physics_process(delta):
 			sound_footsteps.stream_paused = false
 	
 	# Landing after jump or falling
-	
 	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
 	
 	if is_on_floor() and not was_on_floor: # Just landed
@@ -111,7 +101,6 @@ func _physics_process(delta):
 	was_on_floor = is_on_floor()
 	
 	# Falling/respawning
-	
 	if position.y < -10:
 		get_tree().reload_current_scene()
 
@@ -119,16 +108,13 @@ func _physics_process(delta):
 
 func _input(event):
 	if event is InputEventMouseMotion and mouse_captured:
-		
 		input_mouse = event.relative / mouse_sensitivity
 		
 		rotation_target.y -= event.relative.x / mouse_sensitivity
 		rotation_target.x -= event.relative.y / mouse_sensitivity
 
 func handle_controls(_delta):
-	
 	# Mouse capture
-	
 	if Input.is_action_just_pressed("mouse_capture"):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		mouse_captured = true
@@ -140,7 +126,6 @@ func handle_controls(_delta):
 		input_mouse = Vector2.ZERO
 	
 	# Movement
-	
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var input_vector = Vector3(input.x, 0, input.y).normalized()
 	input_vector = transform.basis * input_vector # turn in direction of camera
@@ -170,8 +155,6 @@ func handle_controls(_delta):
 			
 		if(jump_single): action_jump()
 		
-	# Weapon switching
-	
 	action_weapon_toggle()
 
 func action_jump():
@@ -179,7 +162,6 @@ func action_jump():
 	jump_double = true;
 
 # Shooting
-
 func action_shoot():
 	
 	if Input.is_action_pressed("shoot"):
@@ -191,18 +173,10 @@ func action_shoot():
 		#container.position.z += 0.25 # Knockback of weapon visual
 		#camera.rotation.x += 0.025 # Knockback of camera
 		
-		#var knockback = -camera.basis.z.normalized() * 50 # goes to one side
 		var knockback = camera.global_basis.z.normalized() * weapon.knockback
-		
-		
-		#var vertical_knockback = camera.basis.y.normalized() * 200 * sin(camera.rotation_degrees.x)
-
 		movement_velocity += knockback
 		
-		# Set muzzle flash position, play animation
-		
 		muzzle.play("default")
-		
 		muzzle.rotation_degrees.z = randf_range(-45, 45)
 		muzzle.scale = Vector3.ONE * randf_range(0.40, 0.75)
 		muzzle.position = container.position - weapon.muzzle_position
@@ -210,25 +184,18 @@ func action_shoot():
 		blaster_cooldown.start(weapon.cooldown)
 		
 		# Shoot the weapon, amount based on shot count
-		
 		for n in weapon.shot_count:
-		
 			raycast.target_position.x = randf_range(-weapon.spread, weapon.spread)
 			raycast.target_position.y = randf_range(-weapon.spread, weapon.spread)
-			
 			raycast.force_raycast_update()
-			
 			if !raycast.is_colliding(): continue # Don't create impact when raycast didn't hit
-			
 			var collider = raycast.get_collider()
 			
 			# Hitting an enemy
-			
 			if collider.has_method("damage"):
 				collider.damage(weapon.damage)
 			
 			# Creating an impact animation
-			
 			var impact = preload("res://objects/impact.tscn")
 			var impact_instance = impact.instantiate()
 			
@@ -239,8 +206,6 @@ func action_shoot():
 			impact_instance.position = raycast.get_collision_point() + (raycast.get_collision_normal() / 10)
 			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true) 
 
-# Toggle between available weapons (listed in 'weapons')
-
 func action_weapon_toggle():
 	
 	if Input.is_action_just_pressed("weapon_toggle"):
@@ -248,32 +213,25 @@ func action_weapon_toggle():
 		weapon_index = wrap(weapon_index + 1, 0, weapons.size())
 		initiate_change_weapon(weapon_index)
 		
-		#Audio.play("sounds/weapon_change.ogg")
+		Audio.play("sounds/weapon_change.ogg")
 
 # Initiates the weapon changing animation (tween)
-
 func initiate_change_weapon(index):
-	
-	weapon_index = index
-	
+	weapon_index = index	
 	tween = get_tree().create_tween()
 	tween.set_ease(Tween.EASE_OUT_IN)
 	tween.tween_property(container, "position", container_offset - Vector3(0, 1, 0), 0.1)
 	tween.tween_callback(change_weapon) # Changes the model
 
 # Switches the weapon model (off-screen)
-
 func change_weapon():
-	
 	weapon = weapons[weapon_index]
 
 	# Step 1. Remove previous weapon model(s) from container
-	
 	for n in container.get_children():
 		container.remove_child(n)
 	
 	# Step 2. Place new weapon model in container
-	
 	var weapon_model = weapon.model.instantiate()
 	container.add_child(weapon_model)
 	
@@ -281,17 +239,14 @@ func change_weapon():
 	weapon_model.rotation_degrees = weapon.rotation
 	
 	# Step 3. Set model to only render on layer 2 (the weapon camera)
-	
 	for child in weapon_model.find_children("*", "MeshInstance3D"):
 		child.layers = 2
 		
 	# Set weapon data
-	
 	raycast.target_position = Vector3(0, 0, -1) * weapon.max_distance
 	crosshair.texture = weapon.crosshair
 
 func damage(amount):
-	
 	health -= amount
 	health_updated.emit(health) # Update health on HUD
 	
