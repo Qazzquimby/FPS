@@ -8,7 +8,7 @@ extends CharacterBody3D
 @export var air_drag: float = 2100
 
 @export var gravity_acceleration: float = 25 #9.8
-@export var terminal_velocity: float = 100
+@export var terminal_velocity: float = 40
 
 @export var jump_strength: float = 12
 @export var coyote_seconds: float = 0.2
@@ -154,7 +154,15 @@ func handle_controls(_delta):
 			jump_double = false
 			
 		if(jump_single): action_jump()
-		
+	
+	if Input.is_action_just_pressed("F"):
+		movement_velocity = -movement_velocity
+	
+	# Crouching
+	if Input.is_action_just_pressed("control"):
+		if not is_on_floor():
+			movement_velocity.y = -terminal_velocity
+	
 	action_weapon_toggle()
 
 func action_jump():
