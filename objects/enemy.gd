@@ -26,49 +26,17 @@ func _process(delta):
 
 	position = target_position
 
-
-# Take damage from player
-
-
-func damage(amount):
-	#Audio.play("sounds/enemy_hurt.ogg")
-
-	health -= amount
-
-	if health <= 0 and !destroyed:
+	if position.distance_to(player.position) < 1.5:
 		destroy()
 
-
-# Destroy the enemy when out of health
+func damage(amount):
+	destroy()
 
 
 func destroy():
-	#Audio.play("sounds/enemy_destroy.ogg")
+	Audio.play("sounds/enemy_destroy.ogg")
 
 	destroyed = true
 	queue_free()
 
 
-# Shoot when timer hits 0
-
-
-func _on_timer_timeout():
-	raycast.force_raycast_update()
-
-	if raycast.is_colliding():
-		var collider = raycast.get_collider()
-
-		if collider.has_method("damage"):  # Raycast collides with player
-			# Play muzzle flash animation(s)
-
-			muzzle_a.frame = 0
-			muzzle_a.play("default")
-			muzzle_a.rotation_degrees.z = randf_range(-45, 45)
-
-			muzzle_b.frame = 0
-			muzzle_b.play("default")
-			muzzle_b.rotation_degrees.z = randf_range(-45, 45)
-
-			#Audio.play("sounds/enemy_attack.ogg")
-
-			collider.damage(5)  # Apply damage to player
