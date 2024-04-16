@@ -57,9 +57,9 @@ sprite_frames = ExtResource("4_m6ukc")
 frame = 2
 
 [node name="RayCast" type="RayCast3D" parent="Head/Camera"]
-exclude_parent = false
-target_position = Vector3(0, 0, -10)
+target_position = Vector3(0, 0, -100)
 collide_with_areas = true
+debug_shape_thickness = 5
 
 [node name="Shadow" type="Decal" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)

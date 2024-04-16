@@ -10,7 +10,7 @@ extends CharacterBody3D
 @export var gravity_acceleration: float = 25 #9.8
 @export var terminal_velocity: float = 40
 
-@export var jump_strength: float = 12
+@export var jump_strength: float = 8
 @export var coyote_seconds: float = 0.2
 @export var jump_queue_seconds: float = 0.5 
 
@@ -34,8 +34,8 @@ var health:int = 100
 
 var was_on_floor := false
 
-var jump_single := true
-var jump_double := true
+var has_double_jump := true
+var has_roo_reverse := true
 
 var container_offset = Vector3(1.2, -1.1, -2.75)
 
@@ -62,7 +62,10 @@ func _physics_process(delta):
 	handle_controls(delta)
 	
 	if is_on_floor():
-		jump_single = true
+		# refresh abilities
+		has_double_jump = true
+		has_roo_reverse = true
+		
 		movement_velocity.y = max(movement_velocity.y, 0.0)
 	
 	movement_velocity.y = clamp( movement_velocity.y - gravity_acceleration * delta, -terminal_velocity, terminal_velocity)
@@ -91,7 +94,7 @@ func _physics_process(delta):
 		if abs(velocity.x) > 1 or abs(velocity.z) > 1:
 			sound_footsteps.stream_paused = false
 	
-	# Landing after jump or falling
+	# Landing
 	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
 	
 	if is_on_floor() and not was_on_floor: # Just landed
@@ -146,17 +149,17 @@ func handle_controls(_delta):
 	
 	# Jumping	
 	if Input.is_action_just_pressed("jump"):
-		if jump_single or jump_double:
+		if is_on_floor() or has_double_jump:
 			Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
-			movement_velocity.y = 8;
+			movement_velocity.y = jump_strength;
 		
-		if jump_double:
-			jump_double = false
-			
-		if(jump_single): action_jump()
-	
+		if not is_on_floor():
+			has_double_jump = false
+				
 	if Input.is_action_just_pressed("F"):
-		movement_velocity = -movement_velocity
+		if has_roo_reverse:
+			movement_velocity = -movement_velocity
+			has_roo_reverse = false
 	
 	# Crouching
 	if Input.is_action_just_pressed("control"):
@@ -165,13 +168,8 @@ func handle_controls(_delta):
 	
 	action_weapon_toggle()
 
-func action_jump():
-	jump_single = false;
-	jump_double = true;
-
 # Shooting
 func action_shoot():
-	
 	if Input.is_action_pressed("shoot"):
 	
 		if !blaster_cooldown.is_stopped(): return # Cooldown for shooting
@@ -209,7 +207,9 @@ func action_shoot():
 			
 			impact_instance.play("shot")
 			
-			get_tree().root.add_child(impact_instance)
+			var tree = get_tree()
+			if tree:
+				tree.root.add_child(impact_instance)
 			
 			impact_instance.position = raycast.get_collision_point() + (raycast.get_collision_normal() / 10)
 			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true) 
