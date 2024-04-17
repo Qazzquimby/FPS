@@ -1,18 +1,19 @@
 extends CharacterBody3D
 
 @export_subgroup("Properties")
-@export var max_movement_speed: float = 15
-@export var acceleration: float = 50.5
-@export var floor_drag: float = 100
-@export var air_acceleration: float = 5.5
-@export var air_drag: float = 2100
+#@export var max_movement_speed := 15.0
+@export var acceleration := 70.5
+@export var floor_drag := 40.0
 
-@export var gravity_acceleration: float = 25 #9.8
-@export var terminal_velocity: float = 40
+@export var air_acceleration := 20.5
+@export var air_drag := 0.0
 
-@export var jump_strength: float = 8
-@export var coyote_seconds: float = 0.2
-@export var jump_queue_seconds: float = 0.5 
+@export var gravity_acceleration := 25.0 #9.8
+@export var terminal_velocity := 40.0
+
+@export var jump_strength := 12.0
+@export var coyote_seconds := 0.2
+@export var jump_queue_seconds := 0.5 
 
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
@@ -104,7 +105,7 @@ func _physics_process(delta):
 	was_on_floor = is_on_floor()
 	
 	# Falling/respawning
-	if position.y < -10:
+	if position.y < -150:
 		get_tree().reload_current_scene()
 
 # Mouse movement
@@ -133,11 +134,23 @@ func handle_controls(_delta):
 	var input_vector = Vector3(input.x, 0, input.y).normalized()
 	input_vector = transform.basis * input_vector # turn in direction of camera
 	
-	var y = movement_velocity.y # seems to not be needed.
-	
-	movement_velocity = lerp(movement_velocity, input_vector * max_movement_speed, acceleration * _delta / max_movement_speed)
-	movement_velocity.y = y
-	
+	var temp_y = movement_velocity.y # keep y unchanged by was movement
+
+	# source engine uses this but im not sure whats the point	
+	#var veer = movement_velocity.x*input_vector.x + movement_velocity.z*input_vector.z
+	var veer = 0;
+	#print(veer, " ", acceleration-veer)
+
+	if is_on_floor():
+		source_engine_braking(_delta, floor_drag)
+		#movement_velocity = lerp(movement_velocity, input_vector * max_movement_speed, acceleration * _delta / max_movement_speed)
+		movement_velocity += input_vector * (acceleration-veer) * _delta
+	else:
+		source_engine_braking(_delta, air_drag)
+		movement_velocity += input_vector * (air_acceleration-veer) * _delta
+		
+	movement_velocity.y = temp_y
+		
 	# Rotation
 	var rotation_input := Input.get_vector("camera_right", "camera_left", "camera_down", "camera_up")
 	
@@ -167,6 +180,11 @@ func handle_controls(_delta):
 			movement_velocity.y = -terminal_velocity
 	
 	action_weapon_toggle()
+
+func source_engine_braking(_delta, braking_decel: float):	
+	braking_decel = clamp(braking_decel, 0, movement_velocity.length() / _delta)
+	var decel_vector = movement_velocity.normalized() * braking_decel * _delta
+	movement_velocity -= decel_vector
 
 # Shooting
 func action_shoot():
@@ -215,7 +233,6 @@ func action_shoot():
 			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true) 
 
 func action_weapon_toggle():
-	
 	if Input.is_action_just_pressed("weapon_toggle"):
 		
 		weapon_index = wrap(weapon_index + 1, 0, weapons.size())
@@ -253,10 +270,3 @@ func change_weapon():
 	# Set weapon data
 	raycast.target_position = Vector3(0, 0, -1) * weapon.max_distance
 	crosshair.texture = weapon.crosshair
-
-func damage(amount):
-	health -= amount
-	health_updated.emit(health) # Update health on HUD
-	
-	if health < 0:
-		get_tree().reload_current_scene() # Reset when out of health
