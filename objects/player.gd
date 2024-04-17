@@ -11,7 +11,7 @@ extends CharacterBody3D
 @export var gravity_acceleration := 25.0 #9.8
 @export var terminal_velocity := 40.0
 
-@export var jump_strength := 12.0
+@export var jump_strength := 15.0
 @export var coyote_seconds := 0.2
 @export var jump_queue_seconds := 0.5 
 
@@ -30,8 +30,6 @@ var movement_velocity: Vector3
 var rotation_target: Vector3
 
 var input_mouse: Vector2
-
-var health:int = 100
 
 var was_on_floor := false
 
@@ -60,6 +58,8 @@ func _ready():
 	initiate_change_weapon(weapon_index)
 
 func _physics_process(delta):
+	movement_velocity = get_real_velocity() # else you could have high "velocity" while running into a wall or falling into the ground.
+	
 	handle_controls(delta)
 	
 	if is_on_floor():
@@ -139,7 +139,6 @@ func handle_controls(_delta):
 	# source engine uses this but im not sure whats the point	
 	#var veer = movement_velocity.x*input_vector.x + movement_velocity.z*input_vector.z
 	var veer = 0;
-	#print(veer, " ", acceleration-veer)
 
 	if is_on_floor():
 		source_engine_braking(_delta, floor_drag)
@@ -165,6 +164,10 @@ func handle_controls(_delta):
 		if is_on_floor() or has_double_jump:
 			Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
 			movement_velocity.y = jump_strength;
+			# redirect horizontal momentum to have same length but be in input direction
+			var horizontal_momentum = Vector3(movement_velocity.x, 0, movement_velocity.z)
+			horizontal_momentum = horizontal_momentum.length() * input_vector
+			movement_velocity = Vector3(horizontal_momentum.x, movement_velocity.y, horizontal_momentum.z)
 		
 		if not is_on_floor():
 			has_double_jump = false

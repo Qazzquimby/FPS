@@ -117,6 +117,10 @@ F={
 ]
 }
 
+[physics]
+
+3d/physics_engine="JoltPhysics3D"
+
 [rendering]
 
 anti_aliasing/quality/screen_space_aa=1
