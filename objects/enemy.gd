@@ -30,6 +30,7 @@ func _process(delta):
 		destroy()
 
 func damage(amount):
+	player.has_double_jump = true
 	destroy()
 
 
