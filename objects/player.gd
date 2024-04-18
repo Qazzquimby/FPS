@@ -167,8 +167,6 @@ func handle_controls(_delta):
 		movement_velocity = slide_velocity + wall_velocity - wall_normal
 
 		movement_velocity.y = max(movement_velocity.y, 0) # consider making it run upwards first and accelerate downwards, like a jump with low grav, so you arc on the wall.
-
-	print(is_on_floor(), " ", is_on_wall())
 	
 	# Jumping	
 	if Input.is_action_just_pressed("jump"):
