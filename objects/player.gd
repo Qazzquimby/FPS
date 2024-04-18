@@ -2,7 +2,7 @@ extends CharacterBody3D
 
 @export_subgroup("Properties")
 #@export var max_movement_speed := 15.0
-@export var acceleration := 70.5
+@export var acceleration := 50.5
 @export var floor_drag := 40.0
 
 @export var air_acceleration := 20.5
@@ -14,6 +14,8 @@ extends CharacterBody3D
 @export var jump_strength := 15.0
 @export var coyote_seconds := 0.2
 @export var jump_queue_seconds := 0.5 
+
+@export var wall_climb_speed := 1.0
 
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
@@ -159,9 +161,16 @@ func handle_controls(_delta):
 
 	action_shoot()
 
-	# wall running
-	if is_on_wall():
+	if is_on_wall() and not is_on_floor():
 		var wall_normal = get_slide_collision(0).get_normal()
+		# wall climb, if facing directly at wall and looking up
+		
+		var up_down_look_angle = camera.global_basis.z.normalized().y # -1 is up, 1 is down
+		if Input.is_action_pressed("move_forward") and wall_normal.dot(input_vector) < -0.5 and up_down_look_angle < 0:
+			movement_velocity.y += -up_down_look_angle * wall_climb_speed
+
+
+		# wall run
 		var wall_velocity = get_slide_collision(0).get_remainder()
 		var slide_velocity = movement_velocity.slide(wall_normal)
 		movement_velocity = slide_velocity + wall_velocity - wall_normal
