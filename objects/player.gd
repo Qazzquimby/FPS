@@ -161,7 +161,7 @@ func handle_controls(_delta):
 
 	action_shoot()
 
-	if is_on_wall() and not is_on_floor() and not Input.is_action_pressed("control"):
+	if is_on_wall() and not is_on_floor() and input_vector.length() > 0.1 and not Input.is_action_pressed("control"):
 		var wall_normal = get_slide_collision(0).get_normal()
 		# wall climb, if facing directly at wall and looking up
 		
