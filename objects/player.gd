@@ -158,10 +158,23 @@ func handle_controls(_delta):
 	
 
 	action_shoot()
+
+	# wall running
+	if is_on_wall():
+		var wall_normal = get_slide_collision(0).get_normal()
+		var wall_velocity = get_slide_collision(0).get_remainder()
+		var slide_velocity = movement_velocity.slide(wall_normal)
+		movement_velocity = slide_velocity + wall_velocity - wall_normal
+
+		movement_velocity.y = max(movement_velocity.y, 0) # consider making it run upwards first and accelerate downwards, like a jump with low grav, so you arc on the wall.
+
+	print(is_on_floor(), " ", is_on_wall())
 	
 	# Jumping	
 	if Input.is_action_just_pressed("jump"):
-		if is_on_floor() or has_double_jump:
+		var is_double_jump = not is_on_floor() and not is_on_wall()
+		
+		if has_double_jump or not is_double_jump:
 			Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
 			movement_velocity.y = jump_strength;
 			# redirect horizontal momentum to have same length but be in input direction
@@ -169,7 +182,7 @@ func handle_controls(_delta):
 			horizontal_momentum = horizontal_momentum.length() * input_vector
 			movement_velocity = Vector3(horizontal_momentum.x, movement_velocity.y, horizontal_momentum.z)
 		
-		if not is_on_floor():
+		if is_double_jump:
 			has_double_jump = false
 				
 	if Input.is_action_just_pressed("F"):
