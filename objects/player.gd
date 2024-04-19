@@ -33,7 +33,7 @@ var rotation_target: Vector3
 
 var input_mouse: Vector2
 
-var was_on_floor := false
+var was_on_floor_last_frame := false
 
 @export var has_double_jump := true 
 # This is exported so killing enemies can refresh doublejump. Maybe instead have a "touched ground" signal that updates abilities to refresh.
@@ -51,16 +51,22 @@ signal health_updated
 @onready var container = $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
 @onready var sound_footsteps = $SoundFootsteps
 @onready var blaster_cooldown = $Cooldown
+@onready var watching = 0 #$Watching
+
+var was_on_floor_watch = 0 #watching.watch_condition(is_on_floor, coyote_seconds)
 
 @export var crosshair:TextureRect
 
 func _ready():
+	print("player top")
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	weapon = weapons[weapon_index] # Weapon must never be nil
 	initiate_change_weapon(weapon_index)
 
+
 func _physics_process(delta):
+	print("physics process")
 	movement_velocity = get_real_velocity() # else you could have high "velocity" while running into a wall or falling into the ground.
 	
 	handle_controls(delta)
@@ -101,11 +107,11 @@ func _physics_process(delta):
 	# Landing
 	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
 	
-	if is_on_floor() and not was_on_floor: # Just landed
+	if is_on_floor() and not was_on_floor_last_frame: # Just landed
 		Audio.play("sounds/land.ogg")
 		camera.position.y = -0.1
 	
-	was_on_floor = is_on_floor()
+	was_on_floor_last_frame = is_on_floor()
 	
 	# Falling/respawning
 	if position.y < -150:
@@ -114,6 +120,7 @@ func _physics_process(delta):
 # Mouse movement
 
 func _input(event):
+	print("player input")
 	if event is InputEventMouseMotion and mouse_captured:
 		input_mouse = event.relative / mouse_sensitivity
 		
@@ -182,7 +189,7 @@ func handle_controls(_delta):
 	
 	# Jumping	
 	if Input.is_action_just_pressed("jump"):
-		var is_double_jump = not is_on_floor() and not is_on_wall()
+		var is_double_jump = not watching.was_true(was_on_floor_watch, coyote_seconds) and not is_on_wall()
 		
 		if has_double_jump or not is_double_jump:
 			Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")

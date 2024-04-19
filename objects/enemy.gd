@@ -29,7 +29,7 @@ func _process(delta):
 	if position.distance_to(player.position) < 1.5:
 		destroy()
 
-func damage(amount):
+func damage(_amount):
 	player.has_double_jump = true
 	destroy()
 
