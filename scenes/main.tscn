@@ -289,7 +289,58 @@ transform = Transform3D(1.01879, 0, -0.0325849, 0, 1, 0, 0.0139588, 0, 2.37822, 
 transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, 5, 0.5, 5.5)
 
 [node name="platform5" parent="Level" instance=ExtResource("5_3s40e")]
-transform = Transform3D(-0.134937, -0.0542307, 0.989369, -0.372907, 0.927869, 0, -0.918005, -0.368942, -0.145427, 7.99844, 2.04128, 14.5281)
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, -0.195946, 0.980243, 0.0270059, -0.971287, -0.190219, -0.142897, 7.99844, 2.04128, 14.5281)
+
+[node name="platform22" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 10.171, 3.80502, 10.7907)
+
+[node name="platform23" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 6.99323, 5.62784, 10.7907)
+
+[node name="platform24" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 4.02163, 6.97887, 14.0849)
+
+[node name="platform25" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 8.38466, 8.89323, 18.1398)
+
+[node name="platform26" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 12.118, 10.4703, 14.7842)
+
+[node name="platform27" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, -0.195946, 0.980243, 0.0270059, -0.971287, -0.190219, -0.142897, 8.58852, 12.9385, 14.3997)
+
+[node name="platform28" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 10.761, 14.7023, 10.6623)
+
+[node name="platform29" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 7.58331, 16.5251, 10.6623)
+
+[node name="platform30" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 4.61171, 17.8761, 13.9565)
+
+[node name="platform31" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 8.97473, 19.7905, 18.0115)
+
+[node name="platform32" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 12.7081, 21.3676, 14.6558)
+
+[node name="platform33" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 12.7081, 21.3676, 22.0941)
+
+[node name="platform34" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 21.4546, 21.3676, 22.0941)
+
+[node name="platform35" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 21.4546, 21.3676, 32.6129)
+
+[node name="platform36" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 31.8585, 21.3676, 32.6129)
+
+[node name="platform37" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 31.8585, 21.3676, 44.9465)
+
+[node name="platform38" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-0.134937, -0.0542307, 0.989369, 0.0490644, 0.996911, 0.0613359, -0.989639, 0.0568199, -0.131859, 47.745, 21.3676, 44.9465)
 
 [node name="Decoration" type="Node" parent="."]
 
