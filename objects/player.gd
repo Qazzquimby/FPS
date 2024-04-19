@@ -5,13 +5,13 @@ extends CharacterBody3D
 @export var acceleration := 50.5
 @export var floor_drag := 40.0
 
-@export var air_acceleration := 20.5
+@export var air_acceleration := 10.5
 @export var air_drag := 0.0
 
 @export var gravity_acceleration := 25.0 #9.8
 @export var terminal_velocity := 40.0
 
-@export var jump_strength := 15.0
+@export var jump_strength := 10.0
 @export var coyote_seconds := 0.2
 @export var jump_queue_seconds := 0.5 
 
@@ -35,7 +35,8 @@ var input_mouse: Vector2
 
 var was_on_floor := false
 
-@export var has_double_jump := true
+@export var has_double_jump := true 
+# This is exported so killing enemies can refresh doublejump. Maybe instead have a "touched ground" signal that updates abilities to refresh.
 var has_roo_reverse := true
 
 var container_offset = Vector3(1.2, -1.1, -2.75)
@@ -139,11 +140,14 @@ func handle_controls(_delta):
 	var temp_y = movement_velocity.y # keep y unchanged by was movement
 
 	# source engine uses this but im not sure whats the point	
-	#var veer = movement_velocity.x*input_vector.x + movement_velocity.z*input_vector.z
-	var veer = 0;
+	var veer = movement_velocity.x*input_vector.x + movement_velocity.z*input_vector.z
+	#var veer = 0;
 
 	if is_on_floor():
-		source_engine_braking(_delta, floor_drag)
+		if Input.is_action_pressed("control"):
+			source_engine_braking(_delta, floor_drag*999)
+		else:
+			source_engine_braking(_delta, floor_drag)
 		#movement_velocity = lerp(movement_velocity, input_vector * max_movement_speed, acceleration * _delta / max_movement_speed)
 		movement_velocity += input_vector * (acceleration-veer) * _delta
 	else:
