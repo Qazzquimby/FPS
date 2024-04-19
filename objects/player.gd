@@ -51,14 +51,12 @@ signal health_updated
 @onready var container = $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
 @onready var sound_footsteps = $SoundFootsteps
 @onready var blaster_cooldown = $Cooldown
-@onready var watching = 0 #$Watching
-
-var was_on_floor_watch = 0 #watching.watch_condition(is_on_floor, coyote_seconds)
+@onready var watching = $Watching
+@onready var was_on_floor_watch = watching.watch_condition(is_on_floor, coyote_seconds)
 
 @export var crosshair:TextureRect
 
 func _ready():
-	print("player top")
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	weapon = weapons[weapon_index] # Weapon must never be nil
@@ -66,7 +64,6 @@ func _ready():
 
 
 func _physics_process(delta):
-	print("physics process")
 	movement_velocity = get_real_velocity() # else you could have high "velocity" while running into a wall or falling into the ground.
 	
 	handle_controls(delta)
@@ -120,7 +117,6 @@ func _physics_process(delta):
 # Mouse movement
 
 func _input(event):
-	print("player input")
 	if event is InputEventMouseMotion and mouse_captured:
 		input_mouse = event.relative / mouse_sensitivity
 		

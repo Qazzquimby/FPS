@@ -14,27 +14,19 @@ func watch_condition(condition: Callable, max_age: float) -> String:
 		time_elapsed[condition_id] = 0.0
 	return condition_id
 
-#func _process(_delta):
-	#print('watch process')
-	#return
-	##for condition_id in condition_history.keys():
-		##var condition_data = condition_history[condition_id]
-		##var current_time = Time.get_ticks_msec()/1000.0
-		##var value_time = {
-			##"value": condition_data["condition"].call(),
-			##"time": current_time
-			##}
-		##condition_data["history"].push_front(value_time)
-		##
-		##var old_time_cutoff = current_time - condition_data["max_duration"]
-		##while condition_data["history"].size() > 0 and condition_data["history"].back()["time"] < old_time_cutoff:
-			##condition_data["history"].pop_back()
-##
-		##while time_elapsed[condition_id] >= condition_data["duration"]:
-			##condition_data["history"].push_front(condition_data["condition"].call())
-			##time_elapsed[condition_id] -= condition_data["duration"]
-			##if condition_data["history"].size() > 120:
-				##condition_data["history"].pop_back()
+func _process(_delta):
+	for condition_id in condition_history.keys():
+		var condition_data = condition_history[condition_id]
+		var current_time = Time.get_ticks_msec()/1000.0
+		var value_time = {
+			"value": condition_data["condition"].call(),
+			"time": current_time
+			}
+		condition_data["history"].push_front(value_time)
+		
+		var old_time_cutoff = current_time - condition_data["max_age"]
+		while condition_data["history"].size() > 0 and condition_data["history"].back()["time"] < old_time_cutoff:
+			condition_data["history"].pop_back()
 
 func was_true(condition_id: String, duration: float) -> bool:
 	if not condition_history.has(condition_id):
@@ -42,9 +34,8 @@ func was_true(condition_id: String, duration: float) -> bool:
 
 	var condition_data = condition_history[condition_id]
 	var oldest_time_to_check = Time.get_ticks_msec()/1000.0 - duration
+	# reversed version of for entry in condition_data["history"]:
 	for entry in condition_data["history"]:
-		if entry["time"] < oldest_time_to_check:
-			return false
-		if not entry["value"]:
-			return false
-	return true
+		if entry["time"] < oldest_time_to_check and entry["value"]:
+			return true
+	return false
