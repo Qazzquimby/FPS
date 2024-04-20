@@ -5,7 +5,7 @@ signal new_velocity
 @export_subgroup("Properties")
 @export var max_ground_speed := 13.0
 @export var acceleration := 50.5
-@export var floor_drag := 20.0
+@export var floor_drag := 40.0
 
 @export var air_acceleration := 10.5
 @export var air_drag := 0.0
@@ -13,7 +13,7 @@ signal new_velocity
 @export var gravity_acceleration := 25.0 #9.8
 @export var terminal_velocity := 40.0
 
-@export var jump_strength := 15.0
+@export var jump_strength := 12.0
 @export var coyote_seconds := 0.1
 @export var wall_coyote_seconds := 0.1
 @export var jump_queue_seconds := 0.5 
