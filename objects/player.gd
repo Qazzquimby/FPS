@@ -1,9 +1,11 @@
 extends CharacterBody3D
 
+signal new_velocity
+
 @export_subgroup("Properties")
 #@export var max_movement_speed := 15.0
-@export var acceleration := 50.5
-@export var floor_drag := 40.0
+@export var acceleration := 40.5
+@export var floor_drag := 50.0
 
 @export var air_acceleration := 10.5
 @export var air_drag := 0.0
@@ -118,9 +120,10 @@ func _physics_process(delta):
 	# Falling/respawning
 	if position.y < -150:
 		get_tree().reload_current_scene()
+	
+	emit_signal("new_velocity", velocity)
 
 # Mouse movement
-
 func _input(event):
 	if event is InputEventMouseMotion and mouse_captured:
 		input_mouse = event.relative / mouse_sensitivity
@@ -148,20 +151,21 @@ func handle_controls(_delta):
 	var temp_y = movement_velocity.y # keep y unchanged by was movement
 
 	# source engine uses this but im not sure whats the point	
-	var veer = movement_velocity.x*input_vector.x + movement_velocity.z*input_vector.z
-	#var veer = 0;
+	#var veer = movement_velocity.x*input_vector.x + movement_velocity.z*input_vector.z
+	var veer = 0;
 
 	if is_on_floor() and watching.was_true(was_on_floor_watch, 0.1): #meant to facilitate bhopping
 		if Input.is_action_pressed("control"):
-			source_engine_braking(_delta, floor_drag*999)
+			source_engine_braking(_delta, 999)
 		else:
 			source_engine_braking(_delta, floor_drag)
 		#movement_velocity = lerp(movement_velocity, input_vector * max_movement_speed, acceleration * _delta / max_movement_speed)
 		movement_velocity += input_vector * (acceleration-veer) * _delta
 	else:
 		if Input.is_action_pressed("control"):
-			source_engine_braking(_delta, air_drag*999)
-		source_engine_braking(_delta, air_drag)
+			source_engine_braking(_delta, 999)
+		else:
+			source_engine_braking(_delta, air_drag)
 		movement_velocity += input_vector * (air_acceleration-veer) * _delta
 		
 	movement_velocity.y = temp_y
