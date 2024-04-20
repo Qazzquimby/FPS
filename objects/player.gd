@@ -13,6 +13,7 @@ extends CharacterBody3D
 
 @export var jump_strength := 10.0
 @export var coyote_seconds := 0.2
+@export var wall_coyote_seconds := 0.2
 @export var jump_queue_seconds := 0.5 
 
 @export var wall_climb_speed := 1.0
@@ -34,6 +35,8 @@ var rotation_target: Vector3
 var input_mouse: Vector2
 
 var was_on_floor_last_frame := false
+var most_recent_wall
+
 
 @export var has_double_jump := true 
 # This is exported so killing enemies can refresh doublejump. Maybe instead have a "touched ground" signal that updates abilities to refresh.
@@ -53,6 +56,7 @@ signal health_updated
 @onready var blaster_cooldown = $Cooldown
 @onready var watching = $Watching
 @onready var was_on_floor_watch = watching.watch_condition(is_on_floor, coyote_seconds)
+@onready var was_on_wall_watch = watching.watch_condition(is_on_wall, wall_coyote_seconds)
 
 @export var crosshair:TextureRect
 
@@ -65,15 +69,16 @@ func _ready():
 
 func _physics_process(delta):
 	movement_velocity = get_real_velocity() # else you could have high "velocity" while running into a wall or falling into the ground.
+	if is_on_wall():
+		most_recent_wall = get_slide_collision(0)
 	
 	handle_controls(delta)
 	
-	if is_on_floor():
+	if is_on_floor() or is_on_wall():
 		# refresh abilities
 		has_double_jump = true
 		has_roo_reverse = true
 		
-		movement_velocity.y = max(movement_velocity.y, 0.0)
 	
 	movement_velocity.y = clamp( movement_velocity.y - gravity_acceleration * delta, -terminal_velocity, terminal_velocity)
 	
@@ -146,7 +151,7 @@ func handle_controls(_delta):
 	var veer = movement_velocity.x*input_vector.x + movement_velocity.z*input_vector.z
 	#var veer = 0;
 
-	if is_on_floor():
+	if is_on_floor() and watching.was_true(was_on_floor_watch, 0.1): #meant to facilitate bhopping
 		if Input.is_action_pressed("control"):
 			source_engine_braking(_delta, floor_drag*999)
 		else:
@@ -154,6 +159,8 @@ func handle_controls(_delta):
 		#movement_velocity = lerp(movement_velocity, input_vector * max_movement_speed, acceleration * _delta / max_movement_speed)
 		movement_velocity += input_vector * (acceleration-veer) * _delta
 	else:
+		if Input.is_action_pressed("control"):
+			source_engine_braking(_delta, air_drag*999)
 		source_engine_braking(_delta, air_drag)
 		movement_velocity += input_vector * (air_acceleration-veer) * _delta
 		
@@ -169,7 +176,7 @@ func handle_controls(_delta):
 	action_shoot()
 
 	if is_on_wall() and not is_on_floor() and input_vector.length() > 0.1 and not Input.is_action_pressed("control"):
-		var wall_normal = get_slide_collision(0).get_normal()
+		var wall_normal = most_recent_wall.get_normal()
 		# wall climb, if facing directly at wall and looking up
 		
 		var up_down_look_angle = camera.global_basis.z.normalized().y # -1 is up, 1 is down
@@ -177,15 +184,17 @@ func handle_controls(_delta):
 			movement_velocity.y += -up_down_look_angle * wall_climb_speed
 
 		# wall run
-		var wall_velocity = get_slide_collision(0).get_remainder()
+		var wall_velocity = most_recent_wall.get_remainder()
 		var slide_velocity = movement_velocity.slide(wall_normal)
 		movement_velocity = slide_velocity + wall_velocity - wall_normal
 
 		movement_velocity.y = max(movement_velocity.y, 0) # consider making it run upwards first and accelerate downwards, like a jump with low grav, so you arc on the wall.
 	
 	# Jumping	
+	var was_on_floor = watching.was_true(was_on_floor_watch, coyote_seconds)
+	var was_on_wall = watching.was_true(was_on_wall_watch, wall_coyote_seconds)
 	if Input.is_action_just_pressed("jump"):
-		var is_double_jump = not watching.was_true(was_on_floor_watch, coyote_seconds) and not is_on_wall()
+		var is_double_jump = not was_on_floor and not was_on_wall
 		
 		if has_double_jump or not is_double_jump:
 			Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
