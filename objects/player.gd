@@ -3,8 +3,8 @@ extends CharacterBody3D
 signal new_velocity
 
 @export_subgroup("Properties")
-#@export var max_movement_speed := 15.0
-@export var acceleration := 40.5
+@export var max_ground_speed := 11.0
+@export var acceleration := 50.5
 @export var floor_drag := 50.0
 
 @export var air_acceleration := 10.5
@@ -152,20 +152,23 @@ func handle_controls(_delta):
 
 	# source engine uses this but im not sure whats the point	
 	#var veer = movement_velocity.x*input_vector.x + movement_velocity.z*input_vector.z
+	# veer seems to add a lot of deceleration. Even with 0 air drag, quickly slowed to a low base speed ~10
 	var veer = 0;
 
 	if is_on_floor() and watching.was_true(was_on_floor_watch, 0.1): #meant to facilitate bhopping
 		if Input.is_action_pressed("control"):
 			source_engine_braking(_delta, 999)
 		else:
-			source_engine_braking(_delta, floor_drag)
+			if Vector2(movement_velocity.x, movement_velocity.z).length() > max_ground_speed:
+				source_engine_braking(_delta, floor_drag)
 		#movement_velocity = lerp(movement_velocity, input_vector * max_movement_speed, acceleration * _delta / max_movement_speed)
 		movement_velocity += input_vector * (acceleration-veer) * _delta
 	else:
 		if Input.is_action_pressed("control"):
 			source_engine_braking(_delta, 999)
 		else:
-			source_engine_braking(_delta, air_drag)
+			pass
+			#source_engine_braking(_delta, air_drag)
 		movement_velocity += input_vector * (air_acceleration-veer) * _delta
 		
 	movement_velocity.y = temp_y
