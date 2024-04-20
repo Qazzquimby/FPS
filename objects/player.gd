@@ -197,22 +197,7 @@ func handle_controls(_delta):
 
 		movement_velocity.y = max(movement_velocity.y, 0) # consider making it run upwards first and accelerate downwards, like a jump with low grav, so you arc on the wall.
 	
-	# Jumping	
-	var was_on_floor = watching.was_true(was_on_floor_watch, coyote_seconds)
-	var was_on_wall = watching.was_true(was_on_wall_watch, wall_coyote_seconds)
-	if Input.is_action_just_pressed("jump"):
-		var is_double_jump = not was_on_floor and not was_on_wall
-		
-		if has_double_jump or not is_double_jump:
-			Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
-			movement_velocity.y = jump_strength;
-			# redirect horizontal momentum to have same length but be in input direction
-			var horizontal_momentum = Vector3(movement_velocity.x, 0, movement_velocity.z)
-			horizontal_momentum = horizontal_momentum.length() * input_vector
-			movement_velocity = Vector3(horizontal_momentum.x, movement_velocity.y, horizontal_momentum.z)
-		
-		if is_double_jump:
-			has_double_jump = false
+	handle_jumping(input_vector)
 				
 	if Input.is_action_just_pressed("F"):
 		if has_roo_reverse:
@@ -230,6 +215,30 @@ func source_engine_braking(_delta, braking_decel: float):
 	braking_decel = clamp(braking_decel, 0, movement_velocity.length() / _delta)
 	var decel_vector = movement_velocity.normalized() * braking_decel * _delta
 	movement_velocity -= decel_vector
+
+func handle_jumping(input_vector):
+	if not Input.is_action_pressed("jump"):
+		return
+	
+	var was_on_floor = watching.was_true(was_on_floor_watch, coyote_seconds)
+	var was_on_wall = watching.was_true(was_on_wall_watch, wall_coyote_seconds)
+	
+	var is_in_air = not was_on_floor and not was_on_wall
+	
+	if not is_in_air:
+		do_jump(input_vector)
+	elif has_double_jump and Input.is_action_just_pressed("jump"):
+		# Holding jump is enough for bhopping, but pressing jump is needed for airjumps
+		has_double_jump = false
+		do_jump(input_vector)
+
+func do_jump(input_vector):
+	Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
+	movement_velocity.y = jump_strength;
+	# redirect horizontal momentum to have same length but be in input direction
+	var horizontal_momentum = Vector2(movement_velocity.x, movement_velocity.z)
+	horizontal_momentum = horizontal_momentum.length() * input_vector
+	movement_velocity = Vector3(horizontal_momentum.x, movement_velocity.y, horizontal_momentum.z)
 
 # Shooting
 func action_shoot():
