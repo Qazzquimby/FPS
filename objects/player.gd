@@ -3,9 +3,9 @@ extends CharacterBody3D
 signal new_velocity
 
 @export_subgroup("Properties")
-@export var max_ground_speed := 11.0
+@export var max_ground_speed := 13.0
 @export var acceleration := 50.5
-@export var floor_drag := 50.0
+@export var floor_drag := 20.0
 
 @export var air_acceleration := 10.5
 @export var air_drag := 0.0
@@ -158,19 +158,19 @@ func handle_controls(_delta):
 	var veer = 0;
 
 	if is_on_floor() and watching.was_true(was_on_floor_watch, 0.1): #meant to facilitate bhopping
-		if Input.is_action_pressed("control"):
-			source_engine_braking(_delta, 999)
-		else:
-			if Vector2(movement_velocity.x, movement_velocity.z).length() > max_ground_speed:
-				source_engine_braking(_delta, floor_drag)
+		source_engine_braking(_delta, floor_drag)
+		
+		var horizontal_velocity = Vector2(movement_velocity.x, movement_velocity.z)
+		if horizontal_velocity.length() > max_ground_speed:
+			print("Overspeed", horizontal_velocity.length())
+			horizontal_velocity = horizontal_velocity.lerp(horizontal_velocity.normalized() * max_ground_speed, 10*_delta)
+			print("after lerp", horizontal_velocity)
+			movement_velocity = Vector3(horizontal_velocity[0], movement_velocity.y, horizontal_velocity[1])
+			
 		#movement_velocity = lerp(movement_velocity, input_vector * max_movement_speed, acceleration * _delta / max_movement_speed)
 		movement_velocity += input_vector * (acceleration-veer) * _delta
 	else:
-		if Input.is_action_pressed("control"):
-			source_engine_braking(_delta, 999)
-		else:
-			pass
-			#source_engine_braking(_delta, air_drag)
+		source_engine_braking(_delta, air_drag)
 		movement_velocity += input_vector * (air_acceleration-veer) * _delta
 		
 	movement_velocity.y = temp_y
@@ -208,15 +208,18 @@ func handle_controls(_delta):
 	
 	# Crouching
 	if Input.is_action_just_pressed("control"):
+		movement_velocity.x = 0
+		movement_velocity.z = 0
 		if not is_on_floor():
 			movement_velocity.y = -terminal_velocity
 	
 	action_weapon_toggle()
 
 func source_engine_braking(_delta, braking_decel: float):	
-	braking_decel = clamp(braking_decel, 0, movement_velocity.length() / _delta)
-	var decel_vector = movement_velocity.normalized() * braking_decel * _delta
-	movement_velocity -= decel_vector
+	if braking_decel > 0.0:	
+		braking_decel = clamp(braking_decel, 0, movement_velocity.length() / _delta)
+		var decel_vector = movement_velocity.normalized() * braking_decel * _delta
+		movement_velocity -= decel_vector
 
 func handle_jumping(input_vector):
 	var time_since_most_recent_jump = Time.get_ticks_msec()/1000.0 - most_recent_jump_time
@@ -241,10 +244,10 @@ func do_jump(input_vector):
 	most_recent_jump_time = Time.get_ticks_msec()/1000.0
 	Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
 	
-	# redirect horizontal momentum to have same length but be in input direction
-	var horizontal_momentum = Vector2(movement_velocity.x, movement_velocity.z)
-	horizontal_momentum = horizontal_momentum.length() * input_vector
-	movement_velocity = Vector3(horizontal_momentum.x, jump_strength, horizontal_momentum.z)
+	# redirect horizontal_velocity momentum to have same length but be in input direction
+	var horizontal_velocity = Vector2(movement_velocity.x, movement_velocity.z)
+	horizontal_velocity = horizontal_velocity.length() * input_vector
+	movement_velocity = Vector3(horizontal_velocity.x, jump_strength, horizontal_velocity.z)
 
 # Shooting
 func action_shoot():
