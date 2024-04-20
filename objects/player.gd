@@ -82,15 +82,16 @@ func _physics_process(delta):
 		# refresh abilities
 		has_double_jump = true
 		has_roo_reverse = true
-		
 	
+	# apply gravity and lock to terminal velocity
 	movement_velocity.y = clamp( movement_velocity.y - gravity_acceleration * delta, -terminal_velocity, terminal_velocity)
-	
 	
 	# Movement
 	var applied_velocity: Vector3
 	
 	applied_velocity = movement_velocity # velocity.lerp(movement_velocity, delta*10) # minor smoothing I guess. Doesn't seem needed.
+	
+	was_on_floor_last_frame = is_on_floor() # must be before move_and_slide
 	
 	velocity = applied_velocity
 	move_and_slide()
@@ -116,8 +117,6 @@ func _physics_process(delta):
 	if is_on_floor() and not was_on_floor_last_frame: # Just landed
 		Audio.play("sounds/land.ogg")
 		camera.position.y = -0.1
-	
-	was_on_floor_last_frame = is_on_floor()
 	
 	# Falling/respawning
 	if position.y < -150:
@@ -157,7 +156,7 @@ func handle_controls(_delta):
 	# veer seems to add a lot of deceleration. Even with 0 air drag, quickly slowed to a low base speed ~10
 	var veer = 0;
 
-	if is_on_floor() and watching.was_true(was_on_floor_watch, 0.1): #meant to facilitate bhopping
+	if is_on_floor() and was_on_floor_last_frame:# watching.was_true(was_on_floor_watch, 0.1): #meant to facilitate bhopping
 		source_engine_braking(_delta, floor_drag)
 		
 		var horizontal_velocity = Vector2(movement_velocity.x, movement_velocity.z)
