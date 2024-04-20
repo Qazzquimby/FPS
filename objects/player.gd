@@ -13,9 +13,9 @@ signal new_velocity
 @export var gravity_acceleration := 25.0 #9.8
 @export var terminal_velocity := 40.0
 
-@export var jump_strength := 10.0
-@export var coyote_seconds := 0.2
-@export var wall_coyote_seconds := 0.2
+@export var jump_strength := 15.0
+@export var coyote_seconds := 0.1
+@export var wall_coyote_seconds := 0.1
 @export var jump_queue_seconds := 0.5 
 
 @export var wall_climb_speed := 1.0
@@ -38,6 +38,8 @@ var input_mouse: Vector2
 
 var was_on_floor_last_frame := false
 var most_recent_wall
+var most_recent_jump_time := 0.0
+var jump_cooldown = coyote_seconds
 
 
 @export var has_double_jump := true 
@@ -217,7 +219,10 @@ func source_engine_braking(_delta, braking_decel: float):
 	movement_velocity -= decel_vector
 
 func handle_jumping(input_vector):
-	if not Input.is_action_pressed("jump"):
+	var time_since_most_recent_jump = Time.get_ticks_msec()/1000.0 - most_recent_jump_time
+	var still_on_cooldown = time_since_most_recent_jump < jump_cooldown
+	
+	if not Input.is_action_pressed("jump") or still_on_cooldown:
 		return
 	
 	var was_on_floor = watching.was_true(was_on_floor_watch, coyote_seconds)
@@ -233,12 +238,13 @@ func handle_jumping(input_vector):
 		do_jump(input_vector)
 
 func do_jump(input_vector):
+	most_recent_jump_time = Time.get_ticks_msec()/1000.0
 	Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
-	movement_velocity.y = jump_strength;
+	
 	# redirect horizontal momentum to have same length but be in input direction
 	var horizontal_momentum = Vector2(movement_velocity.x, movement_velocity.z)
 	horizontal_momentum = horizontal_momentum.length() * input_vector
-	movement_velocity = Vector3(horizontal_momentum.x, movement_velocity.y, horizontal_momentum.z)
+	movement_velocity = Vector3(horizontal_momentum.x, jump_strength, horizontal_momentum.z)
 
 # Shooting
 func action_shoot():

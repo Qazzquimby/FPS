@@ -255,6 +255,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 2.5, -2.5)
 [node name="platform6" parent="Level" instance=ExtResource("5_3s40e")]
 transform = Transform3D(-0.0276862, 0.0553143, -36.2919, -5.69343, 1.76942, 0.887525, 9.66056, 1.04296, 0.419053, -51.0378, 2.80324, -1.85953)
 
+[node name="platform39" parent="Level" instance=ExtResource("5_3s40e")]
+transform = Transform3D(-1.44355, 0.0155931, -716.412, -0.779142, 0.354619, 32.9902, 23.8921, 0.0125062, -42.2096, -763.897, -21.4699, 96.5088)
+
 [node name="platform18" parent="Level" instance=ExtResource("5_3s40e")]
 transform = Transform3D(-0.0648368, 0.0579504, -73.8163, -1.5244, 2.14818, 1.99519, 26.2159, 0.125054, -0.0665438, -640.043, 2.80324, 12.0679)
 
