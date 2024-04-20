@@ -66,15 +66,15 @@ label_settings = ExtResource("4_51bwc")
 [node name="Enemies" type="Node" parent="."]
 
 [node name="enemy-flying" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
-transform = Transform3D(4.23665, 0, 0, 0, 5.82781, 0, 0, 0, 7.64664, 75.0426, 16.8659, 5.82425)
+transform = Transform3D(6, 0, 0, 0, 6, 0, 0, 0, 6, 75.0426, 16.8659, 5.82425)
 player = NodePath("../../Player")
 
 [node name="enemy-flying2" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
-transform = Transform3D(-1.44819e-07, 0, 3.26251, -1.27581, 2.89908, -5.49165e-08, -3.05757, -1.20968, -1.31611e-07, 41.7967, 3.15391, 4.47126)
+transform = Transform3D(-1.40467e-07, -3.89419e-09, 3, -1.15525, 2.76864, -5.04978e-08, -2.76864, -1.15525, -1.31134e-07, 41.7967, 3.15391, 4.47126)
 player = NodePath("../../Player")
 
 [node name="enemy-flying7" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
-transform = Transform3D(-1.44819e-07, 0, 3.26251, -1.27581, 2.89908, -5.49165e-08, -3.05757, -1.20968, -1.31611e-07, 46.9268, -8.56606, 14.9299)
+transform = Transform3D(-1.40467e-07, -3.89419e-09, 3, -1.15525, 2.76864, -5.04978e-08, -2.76864, -1.15525, -1.31134e-07, 46.9268, -8.56606, 14.9299)
 player = NodePath("../../Player")
 
 [node name="enemy-flying3" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
@@ -126,11 +126,11 @@ transform = Transform3D(-1.39564, 0, -1.39564, 0, 1.97373, 0, 1.39564, 0, -1.395
 player = NodePath("../../Player")
 
 [node name="enemy-flying19" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
-transform = Transform3D(-18.5599, 0, -6.58041, 0, 8.72107, 0, 18.5599, 0, -6.58041, -653.04, 7.46454, 11.0713)
+transform = Transform3D(-14.2022, 0, -14.2022, 0, 20.085, 0, 14.2022, 0, -14.2022, -653.04, 7.46454, 11.0713)
 player = NodePath("../../Player")
 
 [node name="enemy-flying20" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
-transform = Transform3D(-18.5599, 0, -6.58041, 0, 8.72107, 0, 18.5599, 0, -6.58041, -20.8412, 7.46454, 385.859)
+transform = Transform3D(-14.1421, 0, -14.1421, 0, 20, 0, 14.1421, 0, -14.1421, -20.8412, 7.46454, 385.859)
 player = NodePath("../../Player")
 
 [node name="enemy-flying4" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
