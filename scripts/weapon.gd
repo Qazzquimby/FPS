@@ -15,6 +15,9 @@ class_name Weapon
 @export_range(1, 5) var shot_count: int = 1  # Amount of shots
 @export_range(0, 50) var knockback: int = 1000  # Amount of knockback
 
+enum SHOT_TYPE { NORMAL , GRAPPLE }
+@export var shot_type: SHOT_TYPE = SHOT_TYPE.NORMAL
+
 @export_subgroup("Sounds")
 @export var sound_shoot: String  # Sound path
 
