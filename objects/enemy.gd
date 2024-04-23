@@ -31,7 +31,8 @@ func _process(delta):
 
 func damage(_amount):
 	player.has_double_jump = true
-	destroy()
+	if (_amount > 0):
+		destroy()
 
 
 func destroy():

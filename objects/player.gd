@@ -250,6 +250,10 @@ func do_jump(input_vector):
 
 # Shooting
 func action_shoot():
+	if (weapon.shot_type == Weapon.SHOT_TYPE.GRAPPLE):
+		grapple_logic() #very dirty way to go about this
+		return
+	
 	if Input.is_action_pressed("shoot"):
 	
 		if !blaster_cooldown.is_stopped(): return # Cooldown for shooting
@@ -299,6 +303,7 @@ func action_weapon_toggle():
 		
 		weapon_index = wrap(weapon_index + 1, 0, weapons.size())
 		initiate_change_weapon(weapon_index)
+		grapple_deployed = false;
 		
 		Audio.play("sounds/weapon_change.ogg")
 
@@ -332,3 +337,48 @@ func change_weapon():
 	# Set weapon data
 	raycast.target_position = Vector3(0, 0, -1) * weapon.max_distance
 	crosshair.texture = weapon.crosshair
+
+
+#=================================
+@export var grapple_target : Node3D
+var grapple_deployed : bool = false;
+
+func grapple_logic():
+	#shoot to place target
+	if Input.is_action_just_pressed("shoot"):
+		
+		raycast.target_position.x = 0
+		raycast.target_position.y = 0
+		raycast.force_raycast_update()
+		if raycast.is_colliding(): # Don't create impact when raycast didn't hit
+			var collider = raycast.get_collider()
+				
+			Audio.play(weapon.sound_shoot)
+			
+			muzzle.play("default")
+			muzzle.rotation_degrees.z = randf_range(-45, 45)
+			muzzle.scale = Vector3.ONE * randf_range(0.40, 0.75)
+			muzzle.position = container.position - weapon.muzzle_position
+			
+			# Hitting an enemy
+			if collider.has_method("damage"):
+				collider.damage(weapon.damage)
+                #even tho damage is zero this gives you your djump back
+				
+			# Creating an impact animation
+			grapple_target.position = raycast.get_collision_point()
+			grapple_deployed = true
+		pass
+	
+	#release/jump to remove target
+	if has_double_jump and Input.is_action_just_pressed("jump"):
+		grapple_deployed = false
+	
+	#hold to zip towards target
+	if grapple_deployed and Input.is_action_pressed("shoot"):
+		var difference = position - grapple_target.position
+		var grapple_speed = terminal_velocity * (difference.limit_length(10.0).length_squared())/100
+		movement_velocity = grapple_speed * -difference.normalized()
+	else:
+		grapple_deployed = false
+		
