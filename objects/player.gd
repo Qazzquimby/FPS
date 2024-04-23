@@ -183,12 +183,12 @@ func handle_controls(_delta):
 
 	action_shoot()
 
-	if is_on_wall() and not is_on_floor() and input_vector.length() > 0.1 and not Input.is_action_pressed("control"):
+	if is_on_wall() and not is_on_floor() and input_vector.length() > 0.1 and Input.is_action_pressed("move_forward") and not Input.is_action_pressed("control"):
 		var wall_normal = most_recent_wall.get_normal()
 		# wall climb, if facing directly at wall and looking up
 		
 		var up_down_look_angle = camera.global_basis.z.normalized().y # -1 is up, 1 is down
-		if Input.is_action_pressed("move_forward") and wall_normal.dot(input_vector) < -0.5 and up_down_look_angle < 0:
+		if wall_normal.dot(input_vector) < -0.5 and up_down_look_angle < 0:
 			movement_velocity.y += -up_down_look_angle * wall_climb_speed
 
 		# wall run
