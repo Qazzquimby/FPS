@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 signal new_velocity
+signal touch_surface
 
 @export_subgroup("Properties")
 @export var max_ground_speed := 13.0
@@ -22,6 +23,9 @@ signal new_velocity
 
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
+
+@export_subgroup("Items")
+@export var items: Array[Item] = []
 
 var weapon: Weapon
 var weapon_index := 0
@@ -78,10 +82,14 @@ func _physics_process(delta):
 	
 	handle_controls(delta)
 	
+	for item in items:
+		item.run_physics_process(delta, self)
+	
 	if is_on_floor() or is_on_wall():
 		# refresh abilities
 		has_double_jump = true
 		has_roo_reverse = true
+		emit_signal("touch_surface")
 	
 	# apply gravity and lock to terminal velocity
 	movement_velocity.y = clamp( movement_velocity.y - gravity_acceleration * delta, -terminal_velocity, terminal_velocity)
@@ -161,9 +169,7 @@ func handle_controls(_delta):
 		
 		var horizontal_velocity = Vector2(movement_velocity.x, movement_velocity.z)
 		if horizontal_velocity.length() > max_ground_speed:
-			print("Overspeed", horizontal_velocity.length())
 			horizontal_velocity = horizontal_velocity.lerp(horizontal_velocity.normalized() * max_ground_speed, 10*_delta)
-			print("after lerp", horizontal_velocity)
 			movement_velocity = Vector3(horizontal_velocity[0], movement_velocity.y, horizontal_velocity[1])
 			
 		#movement_velocity = lerp(movement_velocity, input_vector * max_movement_speed, acceleration * _delta / max_movement_speed)
@@ -363,7 +369,7 @@ func grapple_logic():
 			# Hitting an enemy
 			if collider.has_method("damage"):
 				collider.damage(weapon.damage)
-                #even tho damage is zero this gives you your djump back
+				#even tho damage is zero this gives you your djump back
 				
 			# Creating an impact animation
 			grapple_target.position = raycast.get_collision_point()

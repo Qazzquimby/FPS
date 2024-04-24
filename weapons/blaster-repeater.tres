@@ -16,5 +16,6 @@ damage = 10.0
 spread = 0.0
 shot_count = 1
 knockback = 10
+shot_type = 0
 sound_shoot = "sounds/blaster_repeater.ogg"
 crosshair = ExtResource("1_hoqei")

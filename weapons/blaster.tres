@@ -16,5 +16,6 @@ damage = 25.0
 spread = 0.0
 shot_count = 1
 knockback = 20
+shot_type = 0
 sound_shoot = "sounds/blaster.ogg"
 crosshair = ExtResource("1_2onsr")
